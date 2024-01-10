@@ -19,8 +19,14 @@ namespace MoonSharp.Interpreter.Tree.Statements
 
 				bool forceLast;
 				
-				Statement s = Statement.CreateStatement(lcontext, out forceLast);
-				m_Statements.Add(s);
+				Statement? s = Statement.CreateStatement(lcontext, out forceLast);
+
+                if (s is null && LexerGlobalOptions.UnexpectedSymbolHandling == UnexpectedSymbolHandling.Ignore)
+                {
+					continue;
+                }
+
+                m_Statements.Add(s);
 
 				if (forceLast) break;
 			}

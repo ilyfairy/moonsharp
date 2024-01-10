@@ -14,7 +14,7 @@ namespace MoonSharp.Interpreter.CoreLib
 	public class OsTimeModule
 	{
 		static DateTime Time0 = DateTime.UtcNow;
-		static DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		static DateTime Epoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 		private static DynValue GetUnixTime(DateTime dateTime, DateTime? epoch = null)
 		{
@@ -24,12 +24,6 @@ namespace MoonSharp.Interpreter.CoreLib
 				return DynValue.Nil;
 
 			return DynValue.NewNumber(time);
-		}
-
-		private static DateTime FromUnixTime(double unixtime)
-		{
-			TimeSpan ts = TimeSpan.FromSeconds(unixtime);
-			return Epoch + ts;
 		}
 
 		[MoonSharpModuleMethod]
@@ -109,13 +103,13 @@ namespace MoonSharp.Interpreter.CoreLib
 			string format = (vformat.IsNil()) ? "%c" : vformat.String;
 
 			if (vtime.IsNotNil())
-				reference = FromUnixTime(vtime.Number);
+				reference = DateTimeOffset.FromUnixTimeSeconds((long)vtime.Number).DateTime;
 
 			bool isDst = false;
 
-			if (format.StartsWith("!"))
+			if (format.StartsWith('!'))
 			{
-				format = format.Substring(1);
+				format = format[1..];
 			}
 			else
 			{
@@ -151,8 +145,10 @@ namespace MoonSharp.Interpreter.CoreLib
 
 				return DynValue.NewTable(t);
 			}
-
-			else return DynValue.NewString(StrFTime(format, reference));
+			else
+			{
+                return DynValue.NewString(StrFTime(format, reference));
+            }
 		}
 
 		private static string StrFTime(string format, DateTime d)
@@ -217,13 +213,13 @@ namespace MoonSharp.Interpreter.CoreLib
 					continue;
 				}
 
-				if (c == 'O' || c == 'E') continue; // no modifiers
+				if (c is 'O' or 'E') continue; // no modifiers
 
 				isEscapeSequence = false;
 
-				if (STANDARD_PATTERNS.ContainsKey(c))
+				if (STANDARD_PATTERNS.TryGetValue(c, out string value))
 				{
-					sb.Append(d.ToString(STANDARD_PATTERNS[c]));
+					sb.Append(d.ToString(value));
 				}
 				else if (c == 'e')
 				{

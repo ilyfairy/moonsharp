@@ -167,15 +167,15 @@ namespace MoonSharp.Interpreter
 
 			if (code.StartsWith(StringModule.BASE64_DUMP_HEADER))
 			{
-				code = code.Substring(StringModule.BASE64_DUMP_HEADER.Length);
+				code = code[StringModule.BASE64_DUMP_HEADER.Length..];
 				byte[] data = Convert.FromBase64String(code);
-				using (MemoryStream ms = new MemoryStream(data))
-					return LoadStream(ms, globalTable, codeFriendlyName);
-			}
+                using MemoryStream ms = new(data);
+                return LoadStream(ms, globalTable, codeFriendlyName);
+            }
 
-			string chunkName = string.Format("{0}", codeFriendlyName ?? "chunk_" + m_Sources.Count.ToString());
+			string chunkName = codeFriendlyName ?? "chunk_" + m_Sources.Count.ToString();
 
-			SourceCode source = new SourceCode(codeFriendlyName ?? chunkName, code, m_Sources.Count, this);
+			SourceCode source = new(codeFriendlyName ?? chunkName, code, m_Sources.Count, this);
 
 			m_Sources.Add(source);
 
@@ -456,7 +456,7 @@ namespace MoonSharp.Interpreter
 			this.CheckScriptOwnership(function);
 			this.CheckScriptOwnership(args);
 
-			if (function.Type != DataType.Function && function.Type != DataType.ClrFunction)
+			if (function.Type is not DataType.Function and not DataType.ClrFunction)
 			{
 				DynValue metafunction = m_MainProcessor.GetMetamethod(function, "__call");
 

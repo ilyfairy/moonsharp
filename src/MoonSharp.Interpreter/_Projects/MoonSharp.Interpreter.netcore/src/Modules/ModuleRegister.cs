@@ -111,7 +111,7 @@ namespace MoonSharp.Interpreter
 				}
 				else if (mi.Name == "MoonSharpInit")
 				{
-					object[] args = new object[2] { gtable, table };
+					object[] args = [gtable, table];
 					mi.Invoke(null, args);
 				}
 			}

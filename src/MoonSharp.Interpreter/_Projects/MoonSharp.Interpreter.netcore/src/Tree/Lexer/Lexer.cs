@@ -132,9 +132,10 @@ namespace MoonSharp.Interpreter.Tree
 
 		private void SkipWhiteSpace()
 		{
-			for (; CursorNotEof() && IsWhiteSpace(CursorChar()); CursorNext())
+			while (CursorNotEof() && IsWhiteSpace(CursorChar()))
 			{
-			}
+				CursorNext();
+            }
 		}
 
 
@@ -234,8 +235,7 @@ namespace MoonSharp.Interpreter.Tree
 					return CreateSingleCharToken(TokenType.Comma, fromLine, fromCol);
 				case ':':
 					return PotentiallyDoubleCharOperator(':', TokenType.Colon, TokenType.DoubleColon, fromLine, fromCol);
-				case '"':
-				case '\'':
+				case '\'' or '"':
 					return ReadSimpleStringToken(fromLine, fromCol);
 				case '\0':
 					throw new SyntaxErrorException(CreateToken(TokenType.Invalid, fromLine, fromCol), "unexpected symbol near '{0}'", CursorChar())
@@ -501,7 +501,7 @@ namespace MoonSharp.Interpreter.Tree
 						goto redo_Loop;
 					}
 				}
-				else if (c == '\n' || c == '\r')
+				else if (c is '\n' or '\r')
 				{
 					throw new SyntaxErrorException(
 						CreateToken(TokenType.Invalid, fromLine, fromCol),

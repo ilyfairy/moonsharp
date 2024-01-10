@@ -13,13 +13,13 @@ namespace MoonSharp.Interpreter.Tree.Statements
 
 		bool m_Local = false;
 		bool m_IsMethodCallingConvention = false;
-		string m_MethodName = null;
+		string? m_MethodName = null;
 
 		string m_FriendlyName;
-		List<string> m_TableAccessors;
+		List<string>? m_TableAccessors;
 		FunctionDefinitionExpression m_FuncDef;
 
-		public FunctionDefinitionStatement(ScriptLoadingContext lcontext, bool local, Token localToken)
+		public FunctionDefinitionStatement(ScriptLoadingContext lcontext, bool local, Token? localToken)
 			: base(lcontext)
 		{
 			// here lexer must be at the 'function' keyword

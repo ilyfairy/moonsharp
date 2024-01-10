@@ -82,7 +82,7 @@ namespace MoonSharp.Interpreter.Serialization
 
 		public static string SerializeValue(this DynValue dynValue, int tabs = 0)
 		{
-			if (dynValue.Type == DataType.Nil || dynValue.Type == DataType.Void)
+			if (dynValue.Type is DataType.Nil or DataType.Void)
 				return "nil";
 			else if (dynValue.Type == DataType.Tuple)
 				return (dynValue.Tuple.Any() ? SerializeValue(dynValue.Tuple[0], tabs) : "nil");

@@ -11,7 +11,7 @@ namespace MoonSharp.Interpreter.Tree
 		{ }
 
 
-		protected static Statement CreateStatement(ScriptLoadingContext lcontext, out bool forceLast)
+		protected static Statement? CreateStatement(ScriptLoadingContext lcontext, out bool forceLast)
 		{
 			Token tkn = lcontext.Lexer.Current;
 
@@ -54,7 +54,12 @@ namespace MoonSharp.Interpreter.Tree
 					{
 						Token l = lcontext.Lexer.Current;
 						Expression exp = Expression.PrimaryExp(lcontext);
-						FunctionCallExpression fnexp = exp as FunctionCallExpression;
+						FunctionCallExpression? fnexp = exp as FunctionCallExpression;
+
+						if(exp is null && LexerGlobalOptions.UnexpectedSymbolHandling == UnexpectedSymbolHandling.Ignore)
+						{
+							return null;
+						}
 
 						if (fnexp != null)
 							return new FunctionCallStatement(lcontext, fnexp);
