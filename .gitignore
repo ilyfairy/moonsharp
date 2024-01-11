@@ -170,4 +170,5 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
-/src/MoonSharp.Interpreter/_Projects/MoonSharp.Interpreter.netcore/.vs
+
+**/.vs

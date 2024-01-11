@@ -101,7 +101,7 @@ namespace MoonSharp.Interpreter.CoreLib.StringLib
 		};
 
 
-		public const int MAXCCALLS = 200;
+		public static int MAXCCALLS = 200;
 		public const char L_ESC = '%';
 		public const string SPECIALS = "^$*+?.([%-";
 
