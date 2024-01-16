@@ -10,7 +10,7 @@ namespace MoonSharp.Interpreter.IO
 	/// </summary>
 	public class UndisposableStream : Stream
 	{
-		Stream m_Stream;
+		private readonly Stream m_Stream;
 
 		public UndisposableStream(Stream stream)
 		{
@@ -106,7 +106,7 @@ namespace MoonSharp.Interpreter.IO
 		}
 
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return m_Stream.Equals(obj);
 		}

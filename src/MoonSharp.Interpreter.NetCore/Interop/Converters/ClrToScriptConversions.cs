@@ -12,7 +12,7 @@ namespace MoonSharp.Interpreter.Interop.Converters
 		/// Skips on custom conversions, etc.
 		/// Does NOT throw on failure.
 		/// </summary>
-		internal static DynValue TryObjectToTrivialDynValue(Script script, object obj)
+		internal static DynValue? TryObjectToTrivialDynValue(Script script, object obj)
 		{
 			if (obj == null)
 				return DynValue.Nil;
@@ -42,7 +42,7 @@ namespace MoonSharp.Interpreter.Interop.Converters
 		/// Tries to convert a CLR object to a MoonSharp value, using "simple" logic.
 		/// Does NOT throw on failure.
 		/// </summary>
-		internal static DynValue TryObjectToSimpleDynValue(Script script, object obj)
+		internal static DynValue? TryObjectToSimpleDynValue(Script? script, object obj)
 		{
 			if (obj == null)
 				return DynValue.Nil;
@@ -103,15 +103,15 @@ namespace MoonSharp.Interpreter.Interop.Converters
 		/// </summary>
 		internal static DynValue ObjectToDynValue(Script script, object obj)
 		{
-			DynValue v = TryObjectToSimpleDynValue(script, obj);
+			DynValue? v = TryObjectToSimpleDynValue(script, obj);
 
 			if (v != null) return v;
 
 			v = UserData.Create(obj);
 			if (v != null) return v;
 
-			if (obj is Type)
-				v = UserData.CreateStatic(obj as Type);
+			if (obj is Type type)
+				v = UserData.CreateStatic(type);
 
 			// unregistered enums go as integers
 			if (obj is Enum)
@@ -119,28 +119,26 @@ namespace MoonSharp.Interpreter.Interop.Converters
 
 			if (v != null) return v;
 
-			if (obj is Delegate)
-				return DynValue.NewCallback(CallbackFunction.FromDelegate(script, (Delegate)obj));
+			if (obj is Delegate @delegate)
+				return DynValue.NewCallback(CallbackFunction.FromDelegate(script, @delegate));
 
-			if (obj is MethodInfo)
+			if (obj is MethodInfo mi)
 			{
-				MethodInfo mi = (MethodInfo)obj;
-
 				if (mi.IsStatic)
 				{
 					return DynValue.NewCallback(CallbackFunction.FromMethodInfo(script, mi));
 				}
 			}
 
-			if (obj is System.Collections.IList)
+			if (obj is System.Collections.IList list)
 			{
-				Table t = TableConversions.ConvertIListToTable(script, (System.Collections.IList)obj);
+				Table t = TableConversions.ConvertIListToTable(script, list);
 				return DynValue.NewTable(t);
 			}
 
-			if (obj is System.Collections.IDictionary)
+			if (obj is System.Collections.IDictionary dic)
 			{
-				Table t = TableConversions.ConvertIDictionaryToTable(script, (System.Collections.IDictionary)obj);
+				Table t = TableConversions.ConvertIDictionaryToTable(script, dic);
 				return DynValue.NewTable(t);
 			}
 
@@ -157,7 +155,7 @@ namespace MoonSharp.Interpreter.Interop.Converters
 		/// <param name="script">The script.</param>
 		/// <param name="obj">The object.</param>
 		/// <returns></returns>
-		public static DynValue EnumerationToDynValue(Script script, object obj)
+		public static DynValue? EnumerationToDynValue(Script script, object obj)
 		{
 			if (obj is System.Collections.IEnumerable)
 			{

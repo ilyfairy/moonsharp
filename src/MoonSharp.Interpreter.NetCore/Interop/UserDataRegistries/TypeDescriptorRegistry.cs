@@ -16,8 +16,8 @@ namespace MoonSharp.Interpreter.Interop.UserDataRegistries
 	internal static class TypeDescriptorRegistry
 	{
 		private static object s_Lock = new object();
-		private static Dictionary<Type, IUserDataDescriptor> s_TypeRegistry = new Dictionary<Type, IUserDataDescriptor>();
-		private static Dictionary<Type, IUserDataDescriptor> s_TypeRegistryHistory = new Dictionary<Type, IUserDataDescriptor>();
+		private static Dictionary<Type, IUserDataDescriptor?> s_TypeRegistry = new();
+		private static Dictionary<Type, IUserDataDescriptor?> s_TypeRegistryHistory = new();
 		private static InteropAccessMode s_DefaultAccessMode;
 
 		/// <summary>
@@ -25,7 +25,7 @@ namespace MoonSharp.Interpreter.Interop.UserDataRegistries
 		/// </summary>
 		/// <param name="asm">The assembly.</param>
 		/// <param name="includeExtensionTypes">if set to <c>true</c> extension types are registered to the appropriate registry.</param>
-		internal static void RegisterAssembly(Assembly asm = null, bool includeExtensionTypes = false)
+		internal static void RegisterAssembly(Assembly? asm = null, bool includeExtensionTypes = false)
 		{
 			if (asm == null)
 			{
@@ -138,13 +138,13 @@ namespace MoonSharp.Interpreter.Interop.UserDataRegistries
 		/// <param name="friendlyName">Friendly name of the descriptor.</param>
 		/// <param name="descriptor">The descriptor, or null to use a default one.</param>
 		/// <returns></returns>
-		internal static IUserDataDescriptor RegisterType_Impl(Type type, InteropAccessMode accessMode, string friendlyName, IUserDataDescriptor descriptor)
+		internal static IUserDataDescriptor? RegisterType_Impl(Type type, InteropAccessMode accessMode, string friendlyName, IUserDataDescriptor? descriptor)
 		{
 			accessMode = ResolveDefaultAccessModeForType(accessMode, type);
 
 			lock (s_Lock)
 			{
-				IUserDataDescriptor oldDescriptor = null;
+				IUserDataDescriptor? oldDescriptor = null;
 				s_TypeRegistry.TryGetValue(type, out oldDescriptor);
 
 				if (descriptor == null)
@@ -191,9 +191,9 @@ namespace MoonSharp.Interpreter.Interop.UserDataRegistries
 			}
 		}
 
-		private static IUserDataDescriptor PerformRegistration(Type type, IUserDataDescriptor newDescriptor, IUserDataDescriptor oldDescriptor)
+		private static IUserDataDescriptor PerformRegistration(Type type, IUserDataDescriptor? newDescriptor, IUserDataDescriptor? oldDescriptor)
 		{
-			IUserDataDescriptor result = RegistrationPolicy.HandleRegistration(newDescriptor, oldDescriptor);
+			IUserDataDescriptor? result = RegistrationPolicy.HandleRegistration(newDescriptor, oldDescriptor);
 
 			if (result != oldDescriptor)
 			{
@@ -243,11 +243,11 @@ namespace MoonSharp.Interpreter.Interop.UserDataRegistries
 		/// <param name="type">The CLR type for which the descriptor is desired.</param>
 		/// <param name="searchInterfaces">if set to <c>true</c> interfaces are used in the search.</param>
 		/// <returns></returns>
-		internal static IUserDataDescriptor GetDescriptorForType(Type type, bool searchInterfaces)
+		internal static IUserDataDescriptor? GetDescriptorForType(Type type, bool searchInterfaces)
 		{
 			lock (s_Lock)
 			{
-				IUserDataDescriptor typeDescriptor = null;
+				IUserDataDescriptor? typeDescriptor = null;
 
 				// if the type has been explicitly registered, return its descriptor as it's complete
 				if (s_TypeRegistry.ContainsKey(type))
@@ -263,7 +263,7 @@ namespace MoonSharp.Interpreter.Interop.UserDataRegistries
 				}
 
 				// search for the base object descriptors
-				for (Type t = type; t != null; t = Framework.Do.GetBaseType(t))
+				for (Type? t = type; t != null; t = Framework.Do.GetBaseType(t))
 				{
 					IUserDataDescriptor u;
 
@@ -300,7 +300,7 @@ namespace MoonSharp.Interpreter.Interop.UserDataRegistries
 				{
 					foreach (Type interfaceType in Framework.Do.GetInterfaces(type))
 					{
-						IUserDataDescriptor interfaceDescriptor;
+						IUserDataDescriptor? interfaceDescriptor;
 
 						if (s_TypeRegistry.TryGetValue(interfaceType, out interfaceDescriptor))
 						{
@@ -381,7 +381,7 @@ namespace MoonSharp.Interpreter.Interop.UserDataRegistries
 		/// <summary>
 		/// Gets or sets the registration policy.
 		/// </summary>
-		internal static IRegistrationPolicy RegistrationPolicy { get; set; }
+		internal static IRegistrationPolicy? RegistrationPolicy { get; set; }
 
 
 	}

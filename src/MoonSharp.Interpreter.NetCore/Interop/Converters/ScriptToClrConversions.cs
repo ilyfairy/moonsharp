@@ -77,7 +77,7 @@ namespace MoonSharp.Interpreter.Interop.Converters
 		/// <summary>
 		/// Converts a DynValue to a CLR object of a specific type
 		/// </summary>
-		internal static object DynValueToObjectOfType(DynValue value, Type desiredType, object defaultValue, bool isOptional)
+		internal static object? DynValueToObjectOfType(DynValue value, Type desiredType, object? defaultValue, bool isOptional)
 		{
 			if (desiredType.IsByRef)
 				desiredType = desiredType.GetElementType();
@@ -96,7 +96,7 @@ namespace MoonSharp.Interpreter.Interop.Converters
 				return DynValueToObject(value);
 
 			StringConversions.StringSubtype stringSubType = StringConversions.GetStringSubtype(desiredType);
-			string str = null;
+			string? str = null;
 
 			Type nt = Nullable.GetUnderlyingType(desiredType);
 			Type nullableType = null;
@@ -152,14 +152,14 @@ namespace MoonSharp.Interpreter.Interop.Converters
 					break;
 				case DataType.Function:
 					if (desiredType == typeof(Closure)) return value.Function;
-					else if (desiredType == typeof(ScriptFunctionDelegate)) return value.Function.GetDelegate();
+					else if (desiredType == typeof(ScriptFunctionDelegate)) return value.Function!.GetDelegate();
 					break;
 				case DataType.ClrFunction:
 					if (desiredType == typeof(CallbackFunction)) return value.Callback;
 					else if (desiredType == typeof(Func<ScriptExecutionContext, CallbackArguments, DynValue>)) return value.Callback.ClrCallback;
 					break;
 				case DataType.UserData:
-					if (value.UserData.Object != null)
+					if (value.UserData!.Object != null)
 					{
 						var udObj = value.UserData.Object;
 						var udDesc = value.UserData.Descriptor;
@@ -176,7 +176,7 @@ namespace MoonSharp.Interpreter.Interop.Converters
 						return value.Table;
 					else
 					{
-						object o = TableConversions.ConvertTableToType(value.Table, desiredType);
+						object o = TableConversions.ConvertTableToType(value.Table!, desiredType);
 						if (o != null)
 							return o;
 					}

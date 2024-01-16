@@ -22,7 +22,7 @@ namespace MoonSharp.Interpreter.CoreLib
 		{
 			UserData.RegisterType<FileUserDataBase>(InteropAccessMode.Default, "file");
 
-			Table meta = new Table(ioTable.OwnerScript);
+			Table meta = new(ioTable.OwnerScript);
 			DynValue __index = DynValue.NewCallback(new CallbackFunction(__index_callback, "__index_callback"));
 			meta.Set("__index", __index);
 			ioTable.MetaTable = meta;
@@ -34,7 +34,7 @@ namespace MoonSharp.Interpreter.CoreLib
 
 		private static DynValue __index_callback(ScriptExecutionContext executionContext, CallbackArguments args)
 		{
-			string name = args[1].CastToString();
+			string? name = args[1].CastToString();
 
 			if (name == "stdin")
 				return GetStandardFile(executionContext.GetScript(), StandardFileType.StdIn);
@@ -60,7 +60,7 @@ namespace MoonSharp.Interpreter.CoreLib
 
 			optionsStream = optionsStream ?? Script.GlobalOptions.Platform.IO_GetStandardStream(file);
 
-			FileUserDataBase udb = null;
+			FileUserDataBase? udb = null;
 
 			if (file == StandardFileType.StdIn)
 				udb = StandardIOFileUserDataBase.CreateInputStream(optionsStream);
@@ -142,9 +142,9 @@ namespace MoonSharp.Interpreter.CoreLib
 				return UserData.Create(file);
 			}
 
-			FileUserDataBase inp = null;
+			FileUserDataBase? inp = null;
 
-			if (args[0].Type == DataType.String || args[0].Type == DataType.Number)
+			if (args[0].Type is DataType.String or DataType.Number)
 			{
 				string fileName = args[0].CastToString();
 				inp = Open(executionContext, fileName, GetUTF8Encoding(), defaultFiles == StandardFileType.StdIn ? "r" : "w");
@@ -167,25 +167,21 @@ namespace MoonSharp.Interpreter.CoreLib
 		[MoonSharpModuleMethod]
 		public static DynValue lines(ScriptExecutionContext executionContext, CallbackArguments args)
 		{
-			string filename = args.AsType(0, "lines", DataType.String, false).String;
+			string? filename = args.AsType(0, "lines", DataType.String, false).String;
 
-			try
-			{
-				List<DynValue> readLines = new List<DynValue>();
+            try
+            {
+                List<DynValue> readLines = new List<DynValue>();
 
-				using (var stream = Script.GlobalOptions.Platform.IO_OpenFile(executionContext.GetScript(), filename, null, "r"))
-				{
-					using (var reader = new System.IO.StreamReader(stream))
-					{
-						while (!reader.EndOfStream)
-						{
-							string line = reader.ReadLine();
-							readLines.Add(DynValue.NewString(line));
-						}
-					}
-				}
+				using var stream = Script.GlobalOptions.Platform.IO_OpenFile(executionContext.GetScript(), filename, null, "r");
+				using var reader = new System.IO.StreamReader(stream);
+                while (!reader.EndOfStream)
+                {
+                    string? line = reader.ReadLine();
+                    readLines.Add(DynValue.NewString(line));
+                }
 
-				readLines.Add(DynValue.Nil);
+                readLines.Add(DynValue.Nil);
 
 				return DynValue.FromObject(executionContext.GetScript(), readLines.Select(s => s));
 			}
@@ -198,11 +194,11 @@ namespace MoonSharp.Interpreter.CoreLib
 		[MoonSharpModuleMethod]
 		public static DynValue open(ScriptExecutionContext executionContext, CallbackArguments args)
 		{
-			string filename = args.AsType(0, "open", DataType.String, false).String;
+			string? filename = args.AsType(0, "open", DataType.String, false).String;
 			DynValue vmode = args.AsType(1, "open", DataType.String, true);
 			DynValue vencoding = args.AsType(2, "open", DataType.String, true);
 
-			string mode = vmode.IsNil() ? "r" : vmode.String;
+			string? mode = vmode.IsNil() ? "r" : vmode.String;
 
 			string invalidChars = mode.Replace("+", "")
 				.Replace("r", "")
@@ -221,7 +217,7 @@ namespace MoonSharp.Interpreter.CoreLib
 
 				// list of codes: http://msdn.microsoft.com/en-us/library/vstudio/system.text.encoding%28v=vs.90%29.aspx.
 				// In addition, "binary" is available.
-				Encoding e = null;
+				Encoding? e = null;
 				bool isBinary = Framework.Do.StringContainsChar(mode, 'b');
 
 				if (encoding == "binary")
@@ -266,7 +262,7 @@ namespace MoonSharp.Interpreter.CoreLib
 			if (args[0].Type != DataType.UserData)
 				return DynValue.Nil;
 
-			FileUserDataBase file = args[0].UserData.Object as FileUserDataBase;
+			FileUserDataBase? file = args[0].UserData.Object as FileUserDataBase;
 
 			if (file == null)
 				return DynValue.Nil;

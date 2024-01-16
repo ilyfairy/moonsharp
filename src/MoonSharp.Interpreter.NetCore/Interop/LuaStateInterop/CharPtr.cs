@@ -52,7 +52,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 {
 	public class CharPtr
 	{
-		public char[] chars;
+		public char[]? chars;
 		public int index;
 
 		public char this[int offset]
@@ -175,10 +175,10 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 		{
 			Debug.Assert(ptr1.chars == ptr2.chars); return ptr1.index >= ptr2.index;
 		}
-		public static bool operator ==(CharPtr ptr1, CharPtr ptr2)
+		public static bool operator ==(CharPtr? ptr1, CharPtr? ptr2)
 		{
-			object o1 = ptr1 as CharPtr;
-			object o2 = ptr2 as CharPtr;
+			object? o1 = ptr1 as CharPtr;
+			object? o2 = ptr2 as CharPtr;
 			if ((o1 == null) && (o2 == null)) return true;
 			if (o1 == null) return false;
 			if (o2 == null) return false;
@@ -186,7 +186,7 @@ namespace MoonSharp.Interpreter.Interop.LuaStateInterop
 		}
 		public static bool operator !=(CharPtr ptr1, CharPtr ptr2) { return !(ptr1 == ptr2); }
 
-		public override bool Equals(object o)
+		public override bool Equals(object? o)
 		{
 			return this == (o as CharPtr);
 		}

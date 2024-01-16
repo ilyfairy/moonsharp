@@ -9,7 +9,7 @@ namespace MoonSharp.Interpreter.IO
 	/// </summary>
 	public class BinDumpBinaryWriter : BinaryWriter
 	{
-		Dictionary<string, int> m_StringMap = new Dictionary<string, int>();
+		private readonly Dictionary<string, int> m_StringMap = new();
 
 		public BinDumpBinaryWriter(Stream s) : base(s) { }
 		public BinDumpBinaryWriter(Stream s, Encoding e) : base(s, e) { }

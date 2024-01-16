@@ -6,7 +6,7 @@ namespace MoonSharp.Interpreter.Tree
 	abstract class NodeBase
 	{
 		public Script Script { get; private set; }
-		protected ScriptLoadingContext LoadingContext { get; private set; }
+		protected ScriptLoadingContext? LoadingContext { get; private set; }
 
 		public NodeBase(ScriptLoadingContext lcontext)
 		{

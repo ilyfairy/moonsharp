@@ -12,7 +12,7 @@ namespace MoonSharp.Interpreter
 		/// <value>
 		/// The script owning this resource.
 		/// </value>
-		Script OwnerScript { get; }
+		Script? OwnerScript { get; }
 	}
 
 	internal static class ScriptPrivateResource_Extension
@@ -45,7 +45,7 @@ namespace MoonSharp.Interpreter
 			}
 		}
 
-		public static void CheckScriptOwnership(this IScriptPrivateResource containingResource, IScriptPrivateResource itemResource)
+		public static void CheckScriptOwnership(this IScriptPrivateResource containingResource, IScriptPrivateResource? itemResource)
 		{
 			if (itemResource != null)
 			{

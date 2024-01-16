@@ -13,7 +13,7 @@ namespace MoonSharp.Interpreter
 		readonly LinkedListIndex<DynValue, TablePair> m_ValueMap;
 		readonly LinkedListIndex<string, TablePair> m_StringMap;
 		readonly LinkedListIndex<int, TablePair> m_ArrayMap;
-		readonly Script m_Owner;
+		readonly Script? m_Owner;
 
 		int m_InitArray = 0;
 		int m_CachedLength = -1;
@@ -23,7 +23,7 @@ namespace MoonSharp.Interpreter
 		/// Initializes a new instance of the <see cref="Table"/> class.
 		/// </summary>
 		/// <param name="owner">The owner script.</param>
-		public Table(Script owner)
+		public Table(Script? owner)
 		{
 			m_Values = new LinkedList<TablePair>();
 			m_StringMap = new LinkedListIndex<string, TablePair>(m_Values);
@@ -49,15 +49,12 @@ namespace MoonSharp.Interpreter
 		/// <summary>
 		/// Gets the script owning this resource.
 		/// </summary>
-		public Script OwnerScript
-		{
-			get { return m_Owner; }
-		}
+		public Script? OwnerScript => m_Owner;
 
-		/// <summary>
-		/// Removes all items from the Table.
-		/// </summary>
-		public void Clear()
+        /// <summary>
+        /// Removes all items from the Table.
+        /// </summary>
+        public void Clear()
 		{
 			m_Values.Clear();
 			m_StringMap.Clear();
@@ -122,7 +119,7 @@ namespace MoonSharp.Interpreter
 			}
 		}
 
-		private Table ResolveMultipleKeys(object[] keys, out object key)
+		private Table ResolveMultipleKeys(object[] keys, out object? key)
 		{
 			//Contract.Ensures(Contract.Result<Table>() != null);
 			//Contract.Requires(keys != null);
@@ -431,7 +428,7 @@ namespace MoonSharp.Interpreter
 		/// Multiple keys can be used to access subtables.
 		/// </summary>
 		/// <param name="keys">The keys to access the table and subtables</param>
-		public DynValue RawGet(params object[] keys)
+		public DynValue? RawGet(params object[] keys)
 		{
 			if (keys == null || keys.Length <= 0)
 				return null;
@@ -640,12 +637,12 @@ namespace MoonSharp.Interpreter
 		/// <summary>
 		/// Gets the meta-table associated with this instance.
 		/// </summary>
-		public Table MetaTable
+		public Table? MetaTable
 		{
 			get { return m_MetaTable; }
 			set { this.CheckScriptOwnership(m_MetaTable); m_MetaTable = value; }
 		}
-		private Table m_MetaTable;
+		private Table? m_MetaTable;
 
 
 

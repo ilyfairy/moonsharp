@@ -12,7 +12,7 @@ namespace MoonSharp.Interpreter.IO
 		public BinDumpBinaryReader(Stream s) : base(s) { }
 		public BinDumpBinaryReader(Stream s, Encoding e) : base(s, e) { }
 
-		List<string> m_Strings = new List<string>();
+		private readonly List<string> m_Strings = new();
 
 		public override int ReadInt32()
 		{

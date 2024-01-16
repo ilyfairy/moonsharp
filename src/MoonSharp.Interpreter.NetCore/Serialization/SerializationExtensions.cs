@@ -9,10 +9,10 @@ namespace MoonSharp.Interpreter.Serialization
 	/// </summary>
 	public static class SerializationExtensions
 	{
-		static HashSet<string> LUAKEYWORDS = new HashSet<string>()
-		{
-			"and", "break", "do", "else", "elseif", "end", "false", "for", "function", "goto", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while"
-		};
+		private static readonly HashSet<string> LUAKEYWORDS =
+        [
+            "and", "break", "do", "else", "elseif", "end", "false", "for", "function", "goto", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while"
+		];
 
 
 		public static string Serialize(this Table table, bool prefixReturn = false, int tabs = 0)
@@ -20,8 +20,8 @@ namespace MoonSharp.Interpreter.Serialization
 			if (table.OwnerScript != null)
 				throw new ScriptRuntimeException("Table is not a prime table.");
 
-			string tabstr = new string('\t', tabs);
-			StringBuilder sb = new StringBuilder();
+			string tabstr = new('\t', tabs);
+			StringBuilder sb = new();
 
 			//sb.Append(tabstr);
 
@@ -62,7 +62,7 @@ namespace MoonSharp.Interpreter.Serialization
 			if (dynValue.Type != DataType.String)
 				return false;
 
-			if (dynValue.String.Length == 0)
+			if (dynValue.String!.Length == 0)
 				return false;
 
 			if (LUAKEYWORDS.Contains(dynValue.String))
@@ -85,14 +85,14 @@ namespace MoonSharp.Interpreter.Serialization
 			if (dynValue.Type is DataType.Nil or DataType.Void)
 				return "nil";
 			else if (dynValue.Type == DataType.Tuple)
-				return (dynValue.Tuple.Any() ? SerializeValue(dynValue.Tuple[0], tabs) : "nil");
+				return (dynValue.Tuple!.Any() ? SerializeValue(dynValue.Tuple![0], tabs) : "nil");
 			else if (dynValue.Type == DataType.Number)
 				return dynValue.Number.ToString("r");
 			else if (dynValue.Type == DataType.Boolean)
 				return dynValue.Boolean ? "true" : "false";
 			else if (dynValue.Type == DataType.String)
 				return EscapeString(dynValue.String ?? "");
-			else if (dynValue.Type == DataType.Table && dynValue.Table.OwnerScript == null)
+			else if (dynValue.Type == DataType.Table && dynValue.Table!.OwnerScript == null)
 				return Serialize(dynValue.Table, false, tabs);
 			else
 				throw new ScriptRuntimeException("Value is not a primitive value or a prime table.");

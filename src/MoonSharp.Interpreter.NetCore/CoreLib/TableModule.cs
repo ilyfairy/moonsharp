@@ -90,9 +90,9 @@ namespace MoonSharp.Interpreter.CoreLib
 
 				if (lt == null || lt.IsNil())
 				{
-					if (a.Type == DataType.Number && b.Type == DataType.Number)
+					if (a.IsNumber)
 						return a.Number.CompareTo(b.Number);
-					if (a.Type == DataType.String && b.Type == DataType.String)
+					if (a.IsString)
 						return a.String.CompareTo(b.String);
 
 					throw ScriptRuntimeException.CompareInvalidType(a, b);

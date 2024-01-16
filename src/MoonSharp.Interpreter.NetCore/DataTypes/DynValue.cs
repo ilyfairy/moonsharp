@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -11,76 +12,91 @@ namespace MoonSharp.Interpreter
 	/// </summary>
 	public sealed class DynValue
 	{
-		static int s_RefIDCounter = 0;
+		private static int s_RefIDCounter = 0;
 
-		private int m_RefID = ++s_RefIDCounter;
+		private readonly int m_RefID = ++s_RefIDCounter;
 		private int m_HashCode = -1;
 
 		private bool m_ReadOnly;
 		private double m_Number;
-		private object m_Object;
+		private object? m_Object;
 		private DataType m_Type;
 
 
-		/// <summary>
-		/// Gets a unique reference identifier. This is guaranteed to be unique only for dynvalues created in a single thread as it's not thread-safe.
-		/// </summary>
-		public int ReferenceID { get { return m_RefID; } }
+        /// <summary>
+        /// Gets a unique reference identifier. This is guaranteed to be unique only for dynvalues created in a single thread as it's not thread-safe.
+        /// </summary>
+        public int ReferenceID => m_RefID;
 
-		/// <summary>
-		/// Gets the type of the value.
-		/// </summary>
-		public DataType Type { get { return m_Type; } }
+        /// <summary>
+        /// Gets the type of the value.
+        /// </summary>
+        public DataType Type => m_Type;
 		/// <summary>
 		/// Gets the function (valid only if the <see cref="Type"/> is <see cref="DataType.Function"/>)
 		/// </summary>
-		public Closure Function { get { return m_Object as Closure; } }
+		public Closure? Function => m_Object as Closure;
 		/// <summary>
 		/// Gets the numeric value (valid only if the <see cref="Type"/> is <see cref="DataType.Number"/>)
 		/// </summary>
-		public double Number { get { return m_Number; } }
+		public double Number => m_Number;
 		/// <summary>
 		/// Gets the values in the tuple (valid only if the <see cref="Type"/> is Tuple).
 		/// This field is currently also used to hold arguments in values whose <see cref="Type"/> is <see cref="DataType.TailCallRequest"/>.
 		/// </summary>
-		public DynValue[] Tuple { get { return m_Object as DynValue[]; } }
-		/// <summary>
-		/// Gets the coroutine handle. (valid only if the <see cref="Type"/> is Thread).
-		/// </summary>
-		public Coroutine Coroutine { get { return m_Object as Coroutine; } }
-		/// <summary>
-		/// Gets the table (valid only if the <see cref="Type"/> is <see cref="DataType.Table"/>)
-		/// </summary>
-		public Table Table { get { return m_Object as Table; } }
-		/// <summary>
-		/// Gets the boolean value (valid only if the <see cref="Type"/> is <see cref="DataType.Boolean"/>)
-		/// </summary>
-		public bool Boolean { get { return Number != 0; } }
-		/// <summary>
-		/// Gets the string value (valid only if the <see cref="Type"/> is <see cref="DataType.String"/>)
-		/// </summary>
-		public string String { get { return m_Object as string; } }
-		/// <summary>
-		/// Gets the CLR callback (valid only if the <see cref="Type"/> is <see cref="DataType.ClrFunction"/>)
-		/// </summary>
-		public CallbackFunction Callback { get { return m_Object as CallbackFunction; } }
+		public DynValue[]? Tuple => m_Object as DynValue[];
+        /// <summary>
+        /// Gets the coroutine handle. (valid only if the <see cref="Type"/> is Thread).
+        /// </summary>
+        public Coroutine? Coroutine => m_Object as Coroutine;
+        /// <summary>
+        /// Gets the table (valid only if the <see cref="Type"/> is <see cref="DataType.Table"/>)
+        /// </summary>
+        public Table? Table => m_Object as Table;
+        /// <summary>
+        /// Gets the boolean value (valid only if the <see cref="Type"/> is <see cref="DataType.Boolean"/>)
+        /// </summary>
+        public bool Boolean => Number != 0;
+        /// <summary>
+        /// Gets the string value (valid only if the <see cref="Type"/> is <see cref="DataType.String"/>)
+        /// </summary>
+        public string? String => m_Object as string;
+        /// <summary>
+        /// Gets the CLR callback (valid only if the <see cref="Type"/> is <see cref="DataType.ClrFunction"/>)
+        /// </summary>
+        public CallbackFunction? Callback => m_Object as CallbackFunction;
 		/// <summary>
 		/// Gets the tail call data.
 		/// </summary>
-		public TailCallData TailCallData { get { return m_Object as TailCallData; } }
+		public TailCallData? TailCallData => m_Object as TailCallData;
 		/// <summary>
 		/// Gets the yield request data.
 		/// </summary>
-		public YieldRequest YieldRequest { get { return m_Object as YieldRequest; } }
+		public YieldRequest? YieldRequest => m_Object as YieldRequest;
 		/// <summary>
 		/// Gets the tail call data.
 		/// </summary>
-		public UserData UserData { get { return m_Object as UserData; } }
+		public UserData? UserData => m_Object as UserData;
 
 		/// <summary>
 		/// Returns true if this instance is write protected.
 		/// </summary>
-		public bool ReadOnly { get { return m_ReadOnly; } }
+		public bool ReadOnly => m_ReadOnly;
+
+
+		[MemberNotNullWhen(true, nameof(String))]
+		public bool IsString => m_Type is DataType.String;
+
+		[MemberNotNullWhen(true, nameof(Number))]
+		public bool IsNumber => m_Type is DataType.Number;
+
+		[MemberNotNullWhen(true, nameof(Table))]
+		public bool IsTable => m_Type is DataType.Table;
+
+		[MemberNotNullWhen(true, nameof(Tuple))]
+		public bool IsTuple => m_Type is DataType.Tuple;
+
+
 
 
 
@@ -120,7 +136,7 @@ namespace MoonSharp.Interpreter
 		/// <summary>
 		/// Creates a new writable value initialized to the specified string.
 		/// </summary>
-		public static DynValue NewString(string str)
+		public static DynValue NewString(string? str)
 		{
 			return new DynValue()
 			{
@@ -183,7 +199,7 @@ namespace MoonSharp.Interpreter
 		/// <summary>
 		/// Creates a new writable value initialized to the specified CLR callback.
 		/// </summary>
-		public static DynValue NewCallback(Func<ScriptExecutionContext, CallbackArguments, DynValue> callBack, string name = null)
+		public static DynValue NewCallback(Func<ScriptExecutionContext, CallbackArguments, DynValue> callBack, string? name = null)
 		{
 			return new DynValue()
 			{
@@ -343,7 +359,7 @@ namespace MoonSharp.Interpreter
 			if (values.Length == 1)
 				return values[0];
 
-			List<DynValue> vals = new List<DynValue>();
+			List<DynValue?> vals = new();
 
 			foreach (var v in values)
 			{
@@ -453,15 +469,12 @@ namespace MoonSharp.Interpreter
 		/// </summary>
 		public string ToPrintString()
 		{
-			if (this.m_Object != null && this.m_Object is RefIdObject)
+			if (this.m_Object is RefIdObject refid)
 			{
-				RefIdObject refid = (RefIdObject)m_Object;
-
 				string typeString = this.Type.ToLuaTypeString();
 
-				if (m_Object is UserData)
+				if (m_Object is UserData ud)
 				{
-					UserData ud = (UserData)m_Object;
 					string str = ud.Descriptor.AsString(ud.Object);
 					if (str != null)
 						return str;
@@ -470,20 +483,15 @@ namespace MoonSharp.Interpreter
 				return refid.FormatTypeString(typeString);
 			}
 
-			switch (Type)
-			{
-				case DataType.String:
-					return String;
-				case DataType.Tuple:
-					return string.Join("\t", Tuple.Select(t => t.ToPrintString()).ToArray());
-				case DataType.TailCallRequest:
-					return "(TailCallRequest -- INTERNAL!)";
-				case DataType.YieldRequest:
-					return "(YieldRequest -- INTERNAL!)";
-				default:
-					return ToString();
-			}
-		}
+            return Type switch
+            {
+                DataType.String => String!,
+                DataType.Tuple => string.Join("\t", Tuple!.Select(t => t.ToPrintString()).ToArray()),
+                DataType.TailCallRequest => "(TailCallRequest -- INTERNAL!)",
+                DataType.YieldRequest => "(YieldRequest -- INTERNAL!)",
+                _ => ToString(),
+            };
+        }
 
 		/// <summary>
 		/// Returns a string which is what it's expected to be output by debuggers.
@@ -529,36 +537,23 @@ namespace MoonSharp.Interpreter
 		/// </returns>
 		public override string ToString()
 		{
-			switch (Type)
-			{
-				case DataType.Void:
-					return "void";
-				case DataType.Nil:
-					return "nil";
-				case DataType.Boolean:
-					return Boolean.ToString().ToLower();
-				case DataType.Number:
-					return Number.ToString(CultureInfo.InvariantCulture);
-				case DataType.String:
-					return "\"" + String + "\"";
-				case DataType.Function:
-					return string.Format("(Function {0:X8})", Function.EntryPointByteCodeLocation);
-				case DataType.ClrFunction:
-					return string.Format("(Function CLR)", Function);
-				case DataType.Table:
-					return "(Table)";
-				case DataType.Tuple:
-					return string.Join(", ", Tuple.Select(t => t.ToString()).ToArray());
-				case DataType.TailCallRequest:
-					return "Tail:(" + string.Join(", ", Tuple.Select(t => t.ToString()).ToArray()) + ")";
-				case DataType.UserData:
-					return "(UserData)";
-				case DataType.Thread:
-					return string.Format("(Coroutine {0:X8})", this.Coroutine.ReferenceID);
-				default:
-					return "(???)";
-			}
-		}
+            return Type switch
+            {
+                DataType.Void => "void",
+                DataType.Nil => "nil",
+                DataType.Boolean => Boolean.ToString().ToLower(),
+                DataType.Number => Number.ToString(CultureInfo.InvariantCulture),
+                DataType.String => "\"" + String + "\"",
+                DataType.Function => string.Format("(Function {0:X8})", Function.EntryPointByteCodeLocation),
+                DataType.ClrFunction => "(Function CLR)",
+                DataType.Table => "(Table)",
+                DataType.Tuple => string.Join(", ", Tuple.Select(t => t.ToString()).ToArray()),
+                DataType.TailCallRequest => "Tail:(" + string.Join(", ", Tuple.Select(t => t.ToString()).ToArray()) + ")",
+                DataType.UserData => "(UserData)",
+                DataType.Thread => string.Format("(Coroutine {0:X8})", this.Coroutine.ReferenceID),
+                _ => "(???)",
+            };
+        }
 
 		/// <summary>
 		/// Returns a hash code for this instance.
@@ -573,42 +568,19 @@ namespace MoonSharp.Interpreter
 
 			int baseValue = ((int)(Type)) << 27;
 
-			switch (Type)
-			{
-				case DataType.Void:
-				case DataType.Nil:
-					m_HashCode = 0;
-					break;
-				case DataType.Boolean:
-					m_HashCode = Boolean ? 1 : 2;
-					break;
-				case DataType.Number:
-					m_HashCode = baseValue ^ Number.GetHashCode();
-					break;
-				case DataType.String:
-					m_HashCode = baseValue ^ String.GetHashCode();
-					break;
-				case DataType.Function:
-					m_HashCode = baseValue ^ Function.GetHashCode();
-					break;
-				case DataType.ClrFunction:
-					m_HashCode = baseValue ^ Callback.GetHashCode();
-					break;
-				case DataType.Table:
-					m_HashCode = baseValue ^ Table.GetHashCode();
-					break;
-				case DataType.Tuple:
-				case DataType.TailCallRequest:
-					m_HashCode = baseValue ^ Tuple.GetHashCode();
-					break;
-				case DataType.UserData:
-				case DataType.Thread:
-				default:
-					m_HashCode = 999;
-					break;
-			}
-
-			return m_HashCode;
+            m_HashCode = Type switch
+            {
+                DataType.Void or DataType.Nil => 0,
+                DataType.Boolean => Boolean ? 1 : 2,
+                DataType.Number => baseValue ^ Number.GetHashCode(),
+                DataType.String => baseValue ^ String.GetHashCode(),
+                DataType.Function => baseValue ^ Function.GetHashCode(),
+                DataType.ClrFunction => baseValue ^ Callback.GetHashCode(),
+                DataType.Table => baseValue ^ Table.GetHashCode(),
+                DataType.Tuple or DataType.TailCallRequest => baseValue ^ Tuple.GetHashCode(),
+                _ => 999,
+            };
+            return m_HashCode;
 		}
 
 		/// <summary>
@@ -620,7 +592,7 @@ namespace MoonSharp.Interpreter
 		/// </returns>
 		public override bool Equals(object obj)
 		{
-			DynValue other = obj as DynValue;
+			DynValue? other = obj as DynValue;
 
 			if (other == null) return false;
 
@@ -655,8 +627,8 @@ namespace MoonSharp.Interpreter
 					return Coroutine == other.Coroutine;
 				case DataType.UserData:
 					{
-						UserData ud1 = this.UserData;
-						UserData ud2 = other.UserData;
+						UserData? ud1 = this.UserData;
+						UserData? ud2 = other.UserData;
 
 						if (ud1 == null || ud2 == null)
 							return false;
@@ -682,7 +654,7 @@ namespace MoonSharp.Interpreter
 		/// Casts this DynValue to string, using coercion if the type is number.
 		/// </summary>
 		/// <returns>The string representation, or null if not number, not string.</returns>
-		public string CastToString()
+		public string? CastToString()
 		{
 			DynValue rv = ToScalar();
 			if (rv.Type == DataType.Number)
@@ -726,7 +698,7 @@ namespace MoonSharp.Interpreter
 			DynValue rv = ToScalar();
 			if (rv.Type == DataType.Boolean)
 				return rv.Boolean;
-			else return (rv.Type != DataType.Nil && rv.Type != DataType.Void);
+			else return (rv.Type is not DataType.Nil and not DataType.Void);
 		}
 
 		/// <summary>
@@ -734,7 +706,7 @@ namespace MoonSharp.Interpreter
 		/// null otherwise
 		/// </summary>
 		/// <returns>False if value is false or nil, true otherwise.</returns>
-		public IScriptPrivateResource GetAsPrivateResource()
+		public IScriptPrivateResource? GetAsPrivateResource()
 		{
 			return m_Object as IScriptPrivateResource;
 		}
@@ -745,7 +717,7 @@ namespace MoonSharp.Interpreter
 		/// </summary>
 		public DynValue ToScalar()
 		{
-			if (Type != DataType.Tuple)
+			if (!IsTuple)
 				return this;
 
 			if (Tuple.Length == 0)
@@ -779,9 +751,9 @@ namespace MoonSharp.Interpreter
 		/// <exception cref="ScriptRuntimeException">Value is not a table or string.</exception>
 		public DynValue GetLength()
 		{
-			if (this.Type == DataType.Table)
+			if (IsTable)
 				return DynValue.NewNumber(this.Table.Length);
-			if (this.Type == DataType.String)
+			if (IsString)
 				return DynValue.NewNumber(this.String.Length);
 
 			throw new ScriptRuntimeException("Can't get length of type {0}", this.Type);
@@ -792,7 +764,7 @@ namespace MoonSharp.Interpreter
 		/// </summary>
 		public bool IsNil()
 		{
-			return this.Type == DataType.Nil || this.Type == DataType.Void;
+			return this.Type is DataType.Nil or DataType.Void;
 		}
 
 		/// <summary>
@@ -800,7 +772,7 @@ namespace MoonSharp.Interpreter
 		/// </summary>
 		public bool IsNotNil()
 		{
-			return this.Type != DataType.Nil && this.Type != DataType.Void;
+			return this.Type is not DataType.Nil and not DataType.Void;
 		}
 
 		/// <summary>
@@ -926,7 +898,7 @@ namespace MoonSharp.Interpreter
 
 				if (desiredType == DataType.String)
 				{
-					string v = this.CastToString();
+					string? v = this.CastToString();
 					if (v != null)
 						return DynValue.NewString(v);
 				}
@@ -946,7 +918,7 @@ namespace MoonSharp.Interpreter
 		/// <param name="argNum">The argument number.</param>
 		/// <param name="flags">The flags.</param>
 		/// <returns></returns>
-		public T CheckUserDataType<T>(string funcName, int argNum = -1, TypeValidationFlags flags = TypeValidationFlags.Default)
+		public T? CheckUserDataType<T>(string funcName, int argNum = -1, TypeValidationFlags flags = TypeValidationFlags.Default)
 		{
 			DynValue v = this.CheckType(funcName, DataType.UserData, argNum, flags);
 			bool allowNil = ((int)(flags & TypeValidationFlags.AllowNil) != 0);
@@ -954,7 +926,7 @@ namespace MoonSharp.Interpreter
 			if (v.IsNil())
 				return default(T);
 
-			object o = v.UserData.Object;
+			object? o = v.UserData.Object;
 			if (o != null && o is T)
 				return (T)o;
 

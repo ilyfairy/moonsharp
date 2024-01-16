@@ -58,7 +58,7 @@ namespace MoonSharp.Interpreter
 		/// <typeparam name="T">The type to be registered</typeparam>
 		/// <param name="accessMode">The access mode (optional).</param>
 		/// <param name="friendlyName">Friendly name for the type (optional)</param>
-		public static IUserDataDescriptor RegisterType<T>(InteropAccessMode accessMode = InteropAccessMode.Default, string friendlyName = null)
+		public static IUserDataDescriptor? RegisterType<T>(InteropAccessMode accessMode = InteropAccessMode.Default, string friendlyName = null)
 		{
 			return TypeDescriptorRegistry.RegisterType_Impl(typeof(T), accessMode, friendlyName, null);
 		}
@@ -69,7 +69,7 @@ namespace MoonSharp.Interpreter
 		/// <param name="type">The type to be registered</param>
 		/// <param name="accessMode">The access mode (optional).</param>
 		/// <param name="friendlyName">Friendly name for the type (optional)</param>
-		public static IUserDataDescriptor RegisterType(Type type, InteropAccessMode accessMode = InteropAccessMode.Default, string friendlyName = null)
+		public static IUserDataDescriptor? RegisterType(Type type, InteropAccessMode accessMode = InteropAccessMode.Default, string friendlyName = null)
 		{
 			return TypeDescriptorRegistry.RegisterType_Impl(type, accessMode, friendlyName, null);
 		}
@@ -331,7 +331,7 @@ namespace MoonSharp.Interpreter
 		/// <typeparam name="T">The CLR type for which the descriptor is desired.</typeparam>
 		/// <param name="searchInterfaces">if set to <c>true</c> interfaces are used in the search.</param>
 		/// <returns></returns>
-		public static IUserDataDescriptor GetDescriptorForType<T>(bool searchInterfaces)
+		public static IUserDataDescriptor? GetDescriptorForType<T>(bool searchInterfaces)
 		{
 			return TypeDescriptorRegistry.GetDescriptorForType(typeof(T), searchInterfaces);
 		}
@@ -342,7 +342,7 @@ namespace MoonSharp.Interpreter
 		/// <param name="type">The CLR type for which the descriptor is desired.</param>
 		/// <param name="searchInterfaces">if set to <c>true</c> interfaces are used in the search.</param>
 		/// <returns></returns>
-		public static IUserDataDescriptor GetDescriptorForType(Type type, bool searchInterfaces)
+		public static IUserDataDescriptor? GetDescriptorForType(Type type, bool searchInterfaces)
 		{
 			return TypeDescriptorRegistry.GetDescriptorForType(type, searchInterfaces);
 		}
@@ -353,7 +353,7 @@ namespace MoonSharp.Interpreter
 		/// </summary>
 		/// <param name="o">The object.</param>
 		/// <returns></returns>
-		public static IUserDataDescriptor GetDescriptorForObject(object o)
+		public static IUserDataDescriptor? GetDescriptorForObject(object o)
 		{
 			return TypeDescriptorRegistry.GetDescriptorForType(o.GetType(), true);
 		}
@@ -364,14 +364,14 @@ namespace MoonSharp.Interpreter
 		/// </summary>
 		/// <param name="useHistoricalData">if set to true, it will also include the last found descriptor of all unregistered types.</param>
 		/// <returns></returns>
-		public static Table GetDescriptionOfRegisteredTypes(bool useHistoricalData = false)
+		public static Table? GetDescriptionOfRegisteredTypes(bool useHistoricalData = false)
 		{
 			DynValue output = DynValue.NewPrimeTable();
 			var registeredTypesPairs = useHistoricalData ? TypeDescriptorRegistry.RegisteredTypesHistory : TypeDescriptorRegistry.RegisteredTypes;
 
 			foreach (var descpair in registeredTypesPairs)
 			{
-				IWireableDescriptor sd = descpair.Value as IWireableDescriptor;
+				IWireableDescriptor? sd = descpair.Value as IWireableDescriptor;
 
 				if (sd != null)
 				{
