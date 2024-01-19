@@ -9,15 +9,15 @@ namespace MoonSharp.Interpreter
 	/// </summary>
 	public class Table : RefIdObject, IScriptPrivateResource
 	{
-		readonly LinkedList<TablePair> m_Values;
-		readonly LinkedListIndex<DynValue, TablePair> m_ValueMap;
-		readonly LinkedListIndex<string, TablePair> m_StringMap;
-		readonly LinkedListIndex<int, TablePair> m_ArrayMap;
-		readonly Script? m_Owner;
+		private readonly LinkedList<TablePair> m_Values;
+		private readonly LinkedListIndex<DynValue, TablePair> m_ValueMap;
+		private readonly LinkedListIndex<string, TablePair> m_StringMap;
+		private readonly LinkedListIndex<int, TablePair> m_ArrayMap;
+		private readonly Script? m_Owner;
 
-		int m_InitArray = 0;
-		int m_CachedLength = -1;
-		bool m_ContainsNilEntries = false;
+		private int m_InitArray = 0;
+		private int m_CachedLength = -1;
+		private bool m_ContainsNilEntries = false;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Table"/> class.

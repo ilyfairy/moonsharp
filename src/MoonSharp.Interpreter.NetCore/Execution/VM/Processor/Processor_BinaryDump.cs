@@ -17,74 +17,70 @@ namespace MoonSharp.Interpreter.Execution.VM
 		{
 			if (stream.Length >= 8)
 			{
-				using (BinaryReader br = new BinaryReader(stream, Encoding.UTF8))
-				{
-					ulong magic = br.ReadUInt64();
-					stream.Seek(-8, SeekOrigin.Current);
-					return magic == DUMP_CHUNK_MAGIC;
-				}
-			}
+                using BinaryReader br = new BinaryReader(stream, Encoding.UTF8);
+                ulong magic = br.ReadUInt64();
+                stream.Seek(-8, SeekOrigin.Current);
+                return magic == DUMP_CHUNK_MAGIC;
+            }
 			return false;
 		}
 
 		internal int Dump(Stream stream, int baseAddress, bool hasUpvalues)
 		{
-			using (BinaryWriter bw = new BinDumpBinaryWriter(stream, Encoding.UTF8))
-			{
-				Dictionary<SymbolRef, int> symbolMap = new Dictionary<SymbolRef, int>();
+            using BinaryWriter bw = new BinDumpBinaryWriter(stream, Encoding.UTF8);
+            Dictionary<SymbolRef, int> symbolMap = new Dictionary<SymbolRef, int>();
 
-				Instruction meta = FindMeta(ref baseAddress);
+            Instruction meta = FindMeta(ref baseAddress);
 
-				if (meta == null)
-					throw new ArgumentException("baseAddress");
+            if (meta == null)
+                throw new ArgumentException("baseAddress");
 
-				bw.Write(DUMP_CHUNK_MAGIC);
-				bw.Write(DUMP_CHUNK_VERSION);
-				bw.Write(hasUpvalues);
-				bw.Write(meta.NumVal);
+            bw.Write(DUMP_CHUNK_MAGIC);
+            bw.Write(DUMP_CHUNK_VERSION);
+            bw.Write(hasUpvalues);
+            bw.Write(meta.NumVal);
 
-				for (int i = 0; i <= meta.NumVal; i++)
-				{
-					SymbolRef[] symbolList;
-					SymbolRef symbol;
+            for (int i = 0; i <= meta.NumVal; i++)
+            {
+                SymbolRef[] symbolList;
+                SymbolRef symbol;
 
-					m_RootChunk.Code[baseAddress + i].GetSymbolReferences(out symbolList, out symbol);
+                m_RootChunk.Code[baseAddress + i].GetSymbolReferences(out symbolList, out symbol);
 
-					if (symbol != null)
-						AddSymbolToMap(symbolMap, symbol);
+                if (symbol != null)
+                    AddSymbolToMap(symbolMap, symbol);
 
-					if (symbolList != null)
-						foreach (var s in symbolList)
-							AddSymbolToMap(symbolMap, s);
-				}
+                if (symbolList != null)
+                    foreach (var s in symbolList)
+                        AddSymbolToMap(symbolMap, s);
+            }
 
-				foreach (SymbolRef sr in symbolMap.Keys.ToArray())
-				{
-					if (sr.i_Env != null)
-						AddSymbolToMap(symbolMap, sr.i_Env);
-				}
+            foreach (SymbolRef sr in symbolMap.Keys.ToArray())
+            {
+                if (sr.i_Env != null)
+                    AddSymbolToMap(symbolMap, sr.i_Env);
+            }
 
-				SymbolRef[] allSymbols = new SymbolRef[symbolMap.Count];
+            SymbolRef[] allSymbols = new SymbolRef[symbolMap.Count];
 
-				foreach (KeyValuePair<SymbolRef, int> pair in symbolMap)
-				{
-					allSymbols[pair.Value] = pair.Key;
-				}
+            foreach (KeyValuePair<SymbolRef, int> pair in symbolMap)
+            {
+                allSymbols[pair.Value] = pair.Key;
+            }
 
-				bw.Write(symbolMap.Count);
+            bw.Write(symbolMap.Count);
 
-				foreach (SymbolRef sym in allSymbols)
-					sym.WriteBinary(bw);
+            foreach (SymbolRef sym in allSymbols)
+                sym.WriteBinary(bw);
 
-				foreach (SymbolRef sym in allSymbols)
-					sym.WriteBinaryEnv(bw, symbolMap);
+            foreach (SymbolRef sym in allSymbols)
+                sym.WriteBinaryEnv(bw, symbolMap);
 
-				for (int i = 0; i <= meta.NumVal; i++)
-					m_RootChunk.Code[baseAddress + i].WriteBinary(bw, baseAddress, symbolMap);
+            for (int i = 0; i <= meta.NumVal; i++)
+                m_RootChunk.Code[baseAddress + i].WriteBinary(bw, baseAddress, symbolMap);
 
-				return meta.NumVal + baseAddress + 1;
-			}
-		}
+            return meta.NumVal + baseAddress + 1;
+        }
 
 		private void AddSymbolToMap(Dictionary<SymbolRef, int> symbolMap, SymbolRef s)
 		{

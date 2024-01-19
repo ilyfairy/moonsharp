@@ -9,15 +9,15 @@ namespace MoonSharp.Interpreter.Execution.VM
 	internal class Instruction
 	{
 		internal OpCode OpCode;
-		internal SymbolRef Symbol;
-		internal SymbolRef[] SymbolList;
+		internal SymbolRef? Symbol;
+		internal SymbolRef?[]? SymbolList;
 		internal string Name;
-		internal DynValue Value;
+		internal DynValue? Value;
 		internal int NumVal;
 		internal int NumVal2;
-		internal SourceRef SourceCodeRef;
+		internal SourceRef? SourceCodeRef;
 
-		internal Instruction(SourceRef sourceref)
+		internal Instruction(SourceRef? sourceref)
 		{
 			SourceCodeRef = sourceref;
 		}
@@ -104,7 +104,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 			wr.Write(id);
 		}
 
-		private static SymbolRef ReadSymbol(BinaryReader rd, SymbolRef[] deserializedSymbols)
+		private static SymbolRef? ReadSymbol(BinaryReader rd, SymbolRef[] deserializedSymbols)
 		{
 			int id = rd.ReadInt32();
 
@@ -149,7 +149,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 			return that;
 		}
 
-		private static DynValue ReadValue(BinaryReader rd, Table envTable)
+		private static DynValue? ReadValue(BinaryReader rd, Table envTable)
 		{
 			bool isnull = !rd.ReadBoolean();
 
@@ -157,24 +157,17 @@ namespace MoonSharp.Interpreter.Execution.VM
 
 			DataType dt = (DataType)rd.ReadByte();
 
-			switch (dt)
-			{
-				case DataType.Nil:
-					return DynValue.NewNil();
-				case DataType.Void:
-					return DynValue.Void;
-				case DataType.Boolean:
-					return DynValue.NewBoolean(rd.ReadBoolean());
-				case DataType.Number:
-					return DynValue.NewNumber(rd.ReadDouble());
-				case DataType.String:
-					return DynValue.NewString(rd.ReadString());
-				case DataType.Table :
-					return DynValue.NewTable(envTable);
-				default:
-					throw new NotSupportedException(string.Format("Unsupported type in chunk dump : {0}", dt));
-			}
-		}
+            return dt switch
+            {
+                DataType.Nil => DynValue.NewNil(),
+                DataType.Void => DynValue.Void,
+                DataType.Boolean => DynValue.NewBoolean(rd.ReadBoolean()),
+                DataType.Number => DynValue.NewNumber(rd.ReadDouble()),
+                DataType.String => DynValue.NewString(rd.ReadString()),
+                DataType.Table => DynValue.NewTable(envTable),
+                _ => throw new NotSupportedException(string.Format("Unsupported type in chunk dump : {0}", dt)),
+            };
+        }
 
 
 		private void DumpValue(BinaryWriter wr, DynValue value)
@@ -201,14 +194,14 @@ namespace MoonSharp.Interpreter.Execution.VM
 					wr.Write(value.Number);
 					break;
 				case DataType.String:
-					wr.Write(value.String);
+					wr.Write(value.String!);
 					break;
 				default:
 					throw new NotSupportedException(string.Format("Unsupported type in chunk dump : {0}", value.Type));
 			}
 		}
 
-		internal void GetSymbolReferences(out SymbolRef[] symbolList, out SymbolRef symbol)
+		internal void GetSymbolReferences(out SymbolRef[]? symbolList, out SymbolRef? symbol)
 		{
 			int usage = (int)OpCode.GetFieldUsage();
 

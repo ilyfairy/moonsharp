@@ -42,7 +42,7 @@ namespace MoonSharp.Interpreter.Interop.Converters
 		/// Tries to convert a CLR object to a MoonSharp value, using "simple" logic.
 		/// Does NOT throw on failure.
 		/// </summary>
-		internal static DynValue? TryObjectToSimpleDynValue(Script? script, object obj)
+		internal static DynValue? TryObjectToSimpleDynValue(Script? script, object? obj)
 		{
 			if (obj == null)
 				return DynValue.Nil;

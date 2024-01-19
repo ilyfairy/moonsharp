@@ -366,7 +366,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 
 				var I = m_RootChunk.Code[c.Debug_EntryPoint];
 
-				string callname = I.OpCode == OpCode.Meta ? I.Name : null;
+				string? callname = I.OpCode == OpCode.Meta ? I.Name : null;
 
 				if (c.ClrFunction != null)
 				{

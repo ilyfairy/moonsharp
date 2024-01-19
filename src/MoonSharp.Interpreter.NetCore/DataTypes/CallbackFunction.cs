@@ -121,7 +121,7 @@ namespace MoonSharp.Interpreter
 		/// <summary>
 		/// Gets or sets an object used as additional data to the callback function (available in the execution context).
 		/// </summary>
-		public object AdditionalData { get; set; }
+		public object? AdditionalData { get; set; }
 
 
 		/// <summary>

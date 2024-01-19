@@ -10,14 +10,14 @@ namespace MoonSharp.Interpreter.Tree
 			: base(lcontext)
 		{ }
 
-		public virtual string GetFriendlyDebugName()
+		public virtual string? GetFriendlyDebugName()
 		{
 			return null;
 		}
 
 		public abstract DynValue Eval(ScriptExecutionContext context);
 
-		public virtual SymbolRef FindDynamic(ScriptExecutionContext context)
+		public virtual SymbolRef? FindDynamic(ScriptExecutionContext context)
 		{
 			return null;
 		}
@@ -62,7 +62,7 @@ namespace MoonSharp.Interpreter.Tree
 
 		internal static Expression SubExpr(ScriptLoadingContext lcontext, bool isPrimary)
 		{
-			Expression e = null;
+			Expression? e = null;
 
 			Token T = lcontext.Lexer.Current;
 
@@ -163,12 +163,12 @@ namespace MoonSharp.Interpreter.Tree
 		/// <returns></returns>
 		internal static Expression PrimaryExp(ScriptLoadingContext lcontext)
 		{
-			Expression e = PrefixExp(lcontext);
+			Expression? e = PrefixExp(lcontext);
 
 			while (true)
 			{
 				Token T = lcontext.Lexer.Current;
-				Token thisCallName = null;
+				Token? thisCallName = null;
 
 				switch (T.Type)
 				{
@@ -215,7 +215,7 @@ namespace MoonSharp.Interpreter.Tree
 
 
 
-		private static Expression PrefixExp(ScriptLoadingContext lcontext)
+		private static Expression? PrefixExp(ScriptLoadingContext lcontext)
 		{
 			Token T = lcontext.Lexer.Current;
 			switch (T.Type)

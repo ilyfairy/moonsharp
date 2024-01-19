@@ -11,10 +11,10 @@ namespace MoonSharp.Interpreter.Execution.VM
 {
 	internal class ByteCode : RefIdObject
 	{
-		public List<Instruction> Code = new List<Instruction>();
+		public List<Instruction> Code = new();
 		public Script Script { get; private set; }
 		private List<SourceRef> m_SourceRefStack = new List<SourceRef>();
-		private SourceRef m_CurrentSourceRef = null;
+		private SourceRef? m_CurrentSourceRef = null;
 
 		internal LoopTracker LoopTracker = new LoopTracker();
 
@@ -24,7 +24,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 		}
 
 
-		public IDisposable EnterSource(SourceRef sref)
+		public IDisposable EnterSource(SourceRef? sref)
 		{
 			return new SourceCodeStackGuard(sref, this);
 		}
@@ -34,7 +34,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 		{
 			ByteCode m_Bc;
 
-			public SourceCodeStackGuard(SourceRef sref, ByteCode bc)
+			public SourceCodeStackGuard(SourceRef? sref, ByteCode bc)
 			{
 				m_Bc = bc;
 				m_Bc.PushSourceRef(sref);
@@ -47,7 +47,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 		}
 
 
-		public void PushSourceRef(SourceRef sref)
+		public void PushSourceRef(SourceRef? sref)
 		{
 			m_SourceRefStack.Add(sref);
 			m_CurrentSourceRef = sref;
@@ -87,7 +87,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 
 		public Instruction GetLastInstruction()
 		{
-			return Code[Code.Count - 1];
+			return Code[^1];
 		}
 
 		private Instruction AppendInstruction(Instruction c)

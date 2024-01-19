@@ -5,9 +5,9 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 {
 	class IndexExpression : Expression, IVariable
 	{
-		Expression m_BaseExp;
-		Expression m_IndexExp;
-		string m_Name;
+		private Expression m_BaseExp;
+		private Expression m_IndexExp;
+		private string? m_Name;
 
 
 		public IndexExpression(Expression baseExp, Expression indexExp, ScriptLoadingContext lcontext)
@@ -33,9 +33,8 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 			{
 				bc.Emit_Index(DynValue.NewString(m_Name), true);
 			}
-			else if (m_IndexExp is LiteralExpression)
+			else if (m_IndexExp is LiteralExpression lit)
 			{
-				LiteralExpression lit = (LiteralExpression)m_IndexExp;
 				bc.Emit_Index(lit.Value);
 			}
 			else
@@ -53,9 +52,8 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 			{
 				bc.Emit_IndexSet(stackofs, tupleidx, DynValue.NewString(m_Name), isNameIndex: true);
 			}
-			else if (m_IndexExp is LiteralExpression)
+			else if (m_IndexExp is LiteralExpression lit)
 			{
-				LiteralExpression lit = (LiteralExpression)m_IndexExp;
 				bc.Emit_IndexSet(stackofs, tupleidx, lit.Value);
 			}
 			else
@@ -70,7 +68,7 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 			DynValue b = m_BaseExp.Eval(context).ToScalar();
 			DynValue i = m_IndexExp != null ? m_IndexExp.Eval(context).ToScalar() : DynValue.NewString(m_Name);
 
-			if (b.Type != DataType.Table) throw new DynamicExpressionException("Attempt to index non-table.");
+			if (!b.IsTable) throw new DynamicExpressionException("Attempt to index non-table.");
 			else if (i.IsNilOrNan()) throw new DynamicExpressionException("Attempt to index with nil or nan key.");
 			return b.Table.Get(i) ?? DynValue.Nil;
 		}

@@ -10,10 +10,10 @@ namespace MoonSharp.Interpreter
 	/// </summary>
 	public class ScriptExecutionContext : IScriptPrivateResource
 	{
-		Processor m_Processor;
-		CallbackFunction m_Callback;
+		private readonly Processor m_Processor;
+		private readonly CallbackFunction? m_Callback;
 
-		internal ScriptExecutionContext(Processor p, CallbackFunction callBackFunction, SourceRef sourceRef, bool isDynamic = false)
+		internal ScriptExecutionContext(Processor p, CallbackFunction? callBackFunction, SourceRef? sourceRef, bool isDynamic = false)
 		{
 			IsDynamicExecution = isDynamic;
 			m_Processor = p;
@@ -35,7 +35,7 @@ namespace MoonSharp.Interpreter
 		/// <summary>
 		/// Gets the location of the code calling back 
 		/// </summary>
-		public SourceRef CallingLocation
+		public SourceRef? CallingLocation
 		{
 			get;
 			private set;
@@ -44,9 +44,9 @@ namespace MoonSharp.Interpreter
 		/// <summary>
 		/// Gets or sets the additional data associated to this CLR function call.
 		/// </summary>
-		public object AdditionalData 
+		public object? AdditionalData 
 		{
-			get { return (m_Callback != null) ? m_Callback.AdditionalData : null; }
+			get { return m_Callback?.AdditionalData; }
 			set 
 			{
 				if (m_Callback == null) throw new InvalidOperationException("Cannot set additional data on a context which has no callback");

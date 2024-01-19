@@ -355,7 +355,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 		{
 			var stackframe = m_ExecutionStack.Peek();
 
-			DynValue v = stackframe.LocalScope[symref.i_Index];
+			DynValue? v = stackframe.LocalScope[symref.i_Index];
 			if (v == null)
 				stackframe.LocalScope[symref.i_Index] = v = DynValue.NewNil();
 
@@ -664,8 +664,8 @@ namespace MoonSharp.Interpreter.Execution.VM
 
 
 
-		private int Internal_ExecCall(int argsCount, int instructionPtr, CallbackFunction handler = null,
-			CallbackFunction continuation = null, bool thisCall = false, string debugText = null, DynValue unwindHandler = null)
+		private int Internal_ExecCall(int argsCount, int instructionPtr, CallbackFunction? handler = null,
+			CallbackFunction? continuation = null, bool thisCall = false, string? debugText = null, DynValue? unwindHandler = null)
 		{
 			DynValue fn = m_ValueStack.Peek(argsCount);
 			CallStackItemFlags flags = (thisCall ? CallStackItemFlags.MethodCall : CallStackItemFlags.None);
@@ -824,7 +824,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 
 
 
-		private int Internal_CheckForTailRequests(Instruction i, int instructionPtr)
+		private int Internal_CheckForTailRequests(Instruction? i, int instructionPtr)
 		{
 			DynValue tail = m_ValueStack.Peek(0);
 

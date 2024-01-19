@@ -6,7 +6,7 @@ namespace MoonSharp.Interpreter.Tree
 {
 	internal class Loop : ILoop
 	{
-		public RuntimeScopeBlock Scope;
+		public RuntimeScopeBlock? Scope;
 		public List<Instruction> BreakJumps = new List<Instruction>();
 
 		public void CompileBreak(ByteCode bc)

@@ -4,7 +4,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 {
 	sealed partial class Processor
 	{
-		private SourceRef GetCurrentSourceRef(int instructionPtr)
+		private SourceRef? GetCurrentSourceRef(int instructionPtr)
 		{
 			if (instructionPtr >= 0 && instructionPtr < m_RootChunk.Code.Count)
 			{
@@ -24,7 +24,7 @@ namespace MoonSharp.Interpreter.Execution.VM
 
 			ex.InstructionPtr = ip;
 
-			SourceRef sref = GetCurrentSourceRef(ip);
+			SourceRef? sref = GetCurrentSourceRef(ip);
 
 			ex.DecorateMessage(m_Script, sref, ip);
 
