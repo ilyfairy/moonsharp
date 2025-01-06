@@ -10,7 +10,7 @@
     <DefineConstants>$(DefineConstants);DOTNET_CORE;NETFX_CORE</DefineConstants>
     <AssemblyName>MoonSharp.Interpreter</AssemblyName>
     <PackageId>MoonSharp.Interpreter.netcore</PackageId>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
     <!--<PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>-->
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
