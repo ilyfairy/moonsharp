@@ -12,7 +12,7 @@ namespace MoonSharp.Interpreter
 #endif
 	public class SyntaxErrorException : InterpreterException
 	{
-		internal Token Token { get; private set; }
+		internal Token? Token { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this exception was caused by premature stream termination (that is, unexpected EOF).
@@ -20,13 +20,13 @@ namespace MoonSharp.Interpreter
 		/// </summary>
 		public bool IsPrematureStreamTermination { get; set; }
 
-		internal SyntaxErrorException(Token t, string format, params object[] args)
+		internal SyntaxErrorException(Token? t, string format, params object[] args)
 			: base(format, args)
 		{
 			Token = t;
 		}
 
-		internal SyntaxErrorException(Token t, string message)
+		internal SyntaxErrorException(Token? t, string message)
 			: base(message)
 		{
 			Token = t;
@@ -55,7 +55,7 @@ namespace MoonSharp.Interpreter
 		{
 			if (Token != null)
 			{
-				DecorateMessage(script, Token.GetSourceRef(false));
+				DecorateMessage(script, Token.Value.GetSourceRef(false));
 			}
 		}
 

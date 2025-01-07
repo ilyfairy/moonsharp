@@ -34,7 +34,7 @@ namespace MoonSharp.Interpreter.Tree
 				if (m_Current == null)
 					Next();
 
-				return m_Current;
+				return m_Current.Value;
 			}
 		}
 
@@ -59,7 +59,7 @@ namespace MoonSharp.Interpreter.Tree
 		public Token PeekNext()
 		{
 			int snapshot = m_Cursor;
-			Token current = m_Current;
+			Token current = m_Current.Value;
 			int line = m_Line;
 			int col = m_Col;
 

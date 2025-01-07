@@ -19,7 +19,7 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 		{
 			Token callToken = thisCallName ?? lcontext.Lexer.Current;
 
-			m_Name = thisCallName != null ? thisCallName.Text : null;
+			m_Name = thisCallName?.Text;
 			m_DebugErr = function.GetFriendlyDebugName();
 			m_Function = function;
 

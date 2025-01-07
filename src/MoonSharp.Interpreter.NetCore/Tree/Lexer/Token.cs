@@ -2,7 +2,7 @@
 
 namespace MoonSharp.Interpreter.Tree
 {
-	internal sealed class Token
+	internal struct Token
 	{
 		public readonly int SourceId;
 		public readonly int FromCol, ToCol, FromLine, ToLine, PrevCol, PrevLine;
