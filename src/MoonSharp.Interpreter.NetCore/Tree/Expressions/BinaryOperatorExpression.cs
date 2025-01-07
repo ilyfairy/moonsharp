@@ -204,42 +204,26 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 
 		private static Operator ParseBinaryOperator(Token token)
 		{
-			switch (token.Type)
-			{
-				case TokenType.Or:
-					return Operator.Or;
-				case TokenType.And:
-					return Operator.And;
-				case TokenType.Op_LessThan:
-					return Operator.Less;
-				case TokenType.Op_GreaterThan:
-					return Operator.Greater;
-				case TokenType.Op_LessThanEqual:
-					return Operator.LessOrEqual;
-				case TokenType.Op_GreaterThanEqual:
-					return Operator.GreaterOrEqual;
-				case TokenType.Op_NotEqual:
-					return Operator.NotEqual;
-				case TokenType.Op_Equal:
-					return Operator.Equal;
-				case TokenType.Op_Concat:
-					return Operator.StrConcat;
-				case TokenType.Op_Add:
-					return Operator.Add;
-				case TokenType.Op_MinusOrSub:
-					return Operator.Sub;
-				case TokenType.Op_Mul:
-					return Operator.Mul;
-				case TokenType.Op_Div:
-					return Operator.Div;
-				case TokenType.Op_Mod:
-					return Operator.Mod;
-				case TokenType.Op_Pwr:
-					return Operator.Power;
-				default:
-					throw new InternalErrorException("Unexpected binary operator '{0}'", token.Text);
-			}
-		}
+            return token.Type switch
+            {
+                TokenType.Or => Operator.Or,
+                TokenType.And => Operator.And,
+                TokenType.Op_LessThan => Operator.Less,
+                TokenType.Op_GreaterThan => Operator.Greater,
+                TokenType.Op_LessThanEqual => Operator.LessOrEqual,
+                TokenType.Op_GreaterThanEqual => Operator.GreaterOrEqual,
+                TokenType.Op_NotEqual => Operator.NotEqual,
+                TokenType.Op_Equal => Operator.Equal,
+                TokenType.Op_Concat => Operator.StrConcat,
+                TokenType.Op_Add => Operator.Add,
+                TokenType.Op_MinusOrSub => Operator.Sub,
+                TokenType.Op_Mul => Operator.Mul,
+                TokenType.Op_Div => Operator.Div,
+                TokenType.Op_Mod => Operator.Mod,
+                TokenType.Op_Pwr => Operator.Power,
+                _ => throw new InternalErrorException("Unexpected binary operator '{0}'", token.Text),
+            };
+        }
 
 
 

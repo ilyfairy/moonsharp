@@ -37,10 +37,10 @@ public class Script : IScriptPrivateResource
 	private IDebugger? m_Debugger;
 	private readonly Table[] m_TypeMetatables = new Table[(int)LuaTypeExtensions.MaxMetaTypes];
 
-	/// <summary>
-	/// Initializes the <see cref="Script"/> class.
-	/// </summary>
-	static Script()
+    /// <summary>
+    /// Initializes the <see cref="Script"/> class.
+    /// </summary>
+    static Script()
 	{
 		GlobalOptions = new ScriptGlobalOptions();
 
@@ -65,23 +65,22 @@ public class Script : IScriptPrivateResource
 	/// Initializes a new instance of the <see cref="Script"/> class.
 	/// </summary>
 	/// <param name="coreModules">The core modules to be pre-registered in the default global table.</param>
-	public Script(CoreModules coreModules)
+	public Script(CoreModules coreModules, int? fastStackSize = null)
 	{
 		Options = new ScriptOptions(DefaultOptions);
 		PerformanceStats = new PerformanceStatistics();
 		Registry = new Table(this);
 
 		m_ByteCode = new ByteCode(this);
-		m_MainProcessor = new Processor(this, m_GlobalTable, m_ByteCode);
+		m_MainProcessor = new Processor(this, m_GlobalTable, m_ByteCode, fastStackSize);
 		m_GlobalTable = new Table(this).RegisterCoreModules(coreModules);
 	}
 
-
-	/// <summary>
-	/// Gets or sets the script loader which will be used as the value of the
-	/// ScriptLoader property for all newly created scripts.
-	/// </summary>
-	public static ScriptOptions DefaultOptions { get; private set; }
+    /// <summary>
+    /// Gets or sets the script loader which will be used as the value of the
+    /// ScriptLoader property for all newly created scripts.
+    /// </summary>
+    public static ScriptOptions DefaultOptions { get; private set; }
 
 	/// <summary>
 	/// Gets access to the script options. 
@@ -113,7 +112,7 @@ public class Script : IScriptPrivateResource
     /// <returns>
     /// A DynValue containing a function which will execute the loaded code.
     /// </returns>
-    public DynValue LoadFunction(string code, Table? globalTable = null, string? funcFriendlyName = null)
+    public DynValue LoadFunction(ReadOnlyMemory<char> code, Table? globalTable = null, string? funcFriendlyName = null)
 	{
 		this.CheckScriptOwnership(globalTable);
 
@@ -157,19 +156,19 @@ public class Script : IScriptPrivateResource
 	/// <returns>
 	/// A DynValue containing a function which will execute the loaded code.
 	/// </returns>
-	public DynValue LoadString(string code, Table? globalTable = null, string? codeFriendlyName = null)
+	public DynValue LoadString(ReadOnlyMemory<char> code, Table? globalTable = null, string? codeFriendlyName = null)
 	{
 		return LoadStringWithReturnSourceCode(code, globalTable, codeFriendlyName).Result;
     }
 
-    private (DynValue Result, SourceCode? Code) LoadStringWithReturnSourceCode(string code, Table? globalTable = null, string? codeFriendlyName = null)
+    private (DynValue Result, SourceCode? Code) LoadStringWithReturnSourceCode(ReadOnlyMemory<char> code, Table? globalTable = null, string? codeFriendlyName = null)
     {
         this.CheckScriptOwnership(globalTable);
 
-        if (code.StartsWith(StringModule.BASE64_DUMP_HEADER))
+        if (code.Span.StartsWith(StringModule.BASE64_DUMP_HEADER))
         {
             code = code[StringModule.BASE64_DUMP_HEADER.Length..];
-            byte[] data = Convert.FromBase64String(code);
+            byte[] data = Convert.FromBase64String(code.ToString());
             using MemoryStream ms = new(data);
 			return (LoadStream(ms, globalTable, codeFriendlyName), null);
         }
@@ -209,14 +208,14 @@ public class Script : IScriptPrivateResource
         {
             using StreamReader sr = new(codeStream);
             string scriptCode = sr.ReadToEnd();
-            return LoadString(scriptCode, globalTable, codeFriendlyName);
+            return LoadString(scriptCode.AsMemory(), globalTable, codeFriendlyName);
         }
         else
         {
             string chunkName = string.Format("{0}", codeFriendlyName ?? "dump_" + m_Sources.Count.ToString());
 
-            SourceCode source = new SourceCode(codeFriendlyName ?? chunkName,
-                string.Format("-- This script was decoded from a binary dump - dump_{0}", m_Sources.Count),
+            SourceCode source = new(codeFriendlyName ?? chunkName,
+                string.Format("-- This script was decoded from a binary dump - dump_{0}", m_Sources.Count).AsMemory(),
                 m_Sources.Count, this);
 
             m_Sources.Add(source);
@@ -287,7 +286,7 @@ public class Script : IScriptPrivateResource
 
 		if (code is string)
 		{
-			return LoadString((string)code, globalContext, friendlyFilename ?? filename);
+			return LoadString(((string)code).AsMemory(), globalContext, friendlyFilename ?? filename);
 		}
 		else if (code is byte[])
 		{
@@ -324,13 +323,13 @@ public class Script : IScriptPrivateResource
 	/// <returns>
 	/// A DynValue containing the result of the processing of the loaded chunk.
 	/// </returns>
-	public DynValue DoString(string code, Table? globalContext = null, string? codeFriendlyName = null)
+	public DynValue DoString(ReadOnlyMemory<char> code, Table? globalContext = null, string? codeFriendlyName = null)
 	{
 		DynValue func = LoadString(code, globalContext, codeFriendlyName);
 		return Call(func);
 	}
 
-    public DynValue DoStringAndRemoveSource(string code, Table? globalContext = null, string? codeFriendlyName = null)
+    public DynValue DoStringAndRemoveSource(ReadOnlyMemory<char> code, Table? globalContext = null, string? codeFriendlyName = null)
     {
 		var (func, codeSource) = LoadStringWithReturnSourceCode(code, globalContext, codeFriendlyName);
         var result = Call(func);
@@ -391,7 +390,7 @@ public class Script : IScriptPrivateResource
 	/// </summary>
 	/// <param name="code">The Lua/MoonSharp code.</param>
 	/// A DynValue containing the result of the processing of the executed script.
-	public static DynValue RunString(string code)
+	public static DynValue RunString(ReadOnlyMemory<char> code)
 	{
 		Script S = new Script();
 		return S.DoString(code);
@@ -679,8 +678,8 @@ public class Script : IScriptPrivateResource
 	/// </summary>
 	public static void WarmUp()
 	{
-		Script s = new Script(CoreModules.Basic);
-		s.LoadString("return 1;");
+		Script s = new(CoreModules.Basic);
+		s.LoadString("return 1;".AsMemory());
 	}
 
 
@@ -691,7 +690,7 @@ public class Script : IScriptPrivateResource
 	/// <returns></returns>
 	public DynamicExpression CreateDynamicExpression(string code)
 	{
-		DynamicExprExpression dee = Loader_Fast.LoadDynamicExpr(this, new SourceCode("__dynamic", code, -1, this));
+		DynamicExprExpression dee = Loader_Fast.LoadDynamicExpr(this, new SourceCode("__dynamic", code.AsMemory(), -1, this));
 		return new DynamicExpression(this, code, dee);
 	}
 

@@ -14,7 +14,7 @@ namespace MoonSharp.Interpreter.Tree.Expressions
 		internal SourceRef SourceRef { get; private set; }
 
 
-		public FunctionCallExpression(ScriptLoadingContext lcontext, Expression function, Token thisCallName)
+		public FunctionCallExpression(ScriptLoadingContext lcontext, Expression function, Token? thisCallName)
 			: base(lcontext)
 		{
 			Token callToken = thisCallName ?? lcontext.Lexer.Current;

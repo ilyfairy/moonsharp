@@ -38,7 +38,7 @@ namespace MoonSharp.Interpreter.DataStructs
 
 		private void Zero(int from, int to)
 		{
-			Array.Clear(m_Storage, from, to - from + 1);
+            Array.Clear(m_Storage, from, to - from + 1);
 		}
 
 		private void Zero(int index)

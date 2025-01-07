@@ -83,7 +83,7 @@ namespace MoonSharp.Interpreter.REPL
 				}
 				else
 				{
-					var v = m_Script.LoadString(m_CurrentCommand, null, "stdin");
+					var v = m_Script.LoadString(m_CurrentCommand.AsMemory(), null, "stdin");
 					result = m_Script.Call(v);
 				}
 

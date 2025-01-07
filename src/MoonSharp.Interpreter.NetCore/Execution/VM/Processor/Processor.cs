@@ -22,8 +22,19 @@ internal sealed partial class Processor
 	private int m_SavedInstructionPtr = -1;
 	private DebugContext m_Debug;
 
-	public Processor(Script script, Table? globalContext, ByteCode byteCode)
+	public Processor(Script script, Table? globalContext, ByteCode byteCode, int? fastStackSize = null)
 	{
+		if (fastStackSize is null)
+		{
+			m_ValueStack = new(131072);
+            m_ExecutionStack = new(131072);
+		}
+		else
+		{
+            m_ValueStack = new(fastStackSize.Value);
+            m_ExecutionStack = new(fastStackSize.Value);
+        }
+
 		m_CoroutinesStack = new List<Processor>();
 
 		m_Debug = new DebugContext();

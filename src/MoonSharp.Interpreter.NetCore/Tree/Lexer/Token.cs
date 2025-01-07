@@ -2,13 +2,13 @@
 
 namespace MoonSharp.Interpreter.Tree
 {
-	class Token
+	internal sealed class Token
 	{
 		public readonly int SourceId;
 		public readonly int FromCol, ToCol, FromLine, ToLine, PrevCol, PrevLine;
 		public readonly TokenType Type;
 
-		public string Text { get; set; }
+		public string Text { get; private set; }
 
 		public Token(TokenType type, int sourceId, int fromLine, int fromCol, int toLine, int toCol, int prevLine, int prevCol)
 		{
@@ -22,6 +22,11 @@ namespace MoonSharp.Interpreter.Tree
 			PrevCol = prevCol;
 			PrevLine = prevLine;
 		}
+
+		public void SetText(string text)
+		{
+            Text = text;
+        }
 
 
 		public override string ToString()

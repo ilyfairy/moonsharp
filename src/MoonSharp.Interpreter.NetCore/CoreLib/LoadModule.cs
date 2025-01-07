@@ -2,6 +2,8 @@
 #pragma warning disable 1591
 
 
+using System;
+
 namespace MoonSharp.Interpreter.CoreLib
 {
 	/// <summary>
@@ -98,7 +100,7 @@ namespace MoonSharp.Interpreter.CoreLib
 				DynValue source = args.AsType(1, "load", DataType.String, true);
 				DynValue env = args.AsType(3, "load", DataType.Table, true);
 
-				DynValue fn = S.LoadString(script,
+				DynValue fn = S.LoadString(script.AsMemory(),
 					!env.IsNil() ? env.Table : defaultEnv,
 					!source.IsNil() ? source.String : "=(load)");
 

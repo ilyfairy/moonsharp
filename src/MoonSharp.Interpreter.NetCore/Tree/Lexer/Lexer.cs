@@ -1,11 +1,12 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace MoonSharp.Interpreter.Tree
 {
 	class Lexer
 	{
-		Token m_Current = null;
-		string m_Code;
+		Token? m_Current = null;
+        ReadOnlyMemory<char> m_Code;
 		int m_PrevLineTo = 0;
 		int m_PrevColTo = 1;
 		int m_Cursor = 0;
@@ -14,14 +15,14 @@ namespace MoonSharp.Interpreter.Tree
 		int m_SourceId;
 		bool m_AutoSkipComments = false;
 
-		public Lexer(int sourceID, string scriptContent, bool autoSkipComments)
+		public Lexer(int sourceID, ReadOnlyMemory<char> scriptContent, bool autoSkipComments)
 		{
 			m_Code = scriptContent;
-			m_SourceId = sourceID;
+            m_SourceId = sourceID;
 
 			// remove unicode BOM if any
-			if (m_Code.Length > 0 && m_Code[0] == 0xFEFF)
-				m_Code = m_Code.Substring(1);
+			if (m_Code.Length > 0 && m_Code.Span[0] == 0xFEFF)
+				m_Code = m_Code[1..];
 
 			m_AutoSkipComments = autoSkipComments;
 		}
@@ -95,7 +96,7 @@ namespace MoonSharp.Interpreter.Tree
 		private char CursorChar()
 		{
 			if (m_Cursor < m_Code.Length)
-				return m_Code[m_Cursor];
+				return m_Code.Span[m_Cursor];
 			else
 				return '\0'; //  sentinel
 		}
@@ -114,7 +115,7 @@ namespace MoonSharp.Interpreter.Tree
 
 				if (j >= m_Code.Length)
 					return false;
-				if (m_Code[j] != pattern[i])
+				if (m_Code.Span[j] != pattern[i])
 					return false;
 			}
 			return true;
@@ -207,7 +208,7 @@ namespace MoonSharp.Interpreter.Tree
 				case '$':
 					return PotentiallyDoubleCharOperator('{', TokenType.Op_Dollar, TokenType.Brk_Open_Curly_Shared, fromLine, fromCol);
 				case '#':
-					if (m_Cursor == 0 && m_Code.Length > 1 && m_Code[1] == '!')
+					if (m_Cursor == 0 && m_Code.Length > 1 && m_Code.Span[1] == '!')
 						return ReadHashBang(fromLine, fromCol);
 
 					return CreateSingleCharToken(TokenType.Op_Len, fromLine, fromCol);
@@ -511,7 +512,7 @@ namespace MoonSharp.Interpreter.Tree
 				{
 					CursorCharNext();
 					Token t = CreateToken(TokenType.String, fromLine, fromCol);
-					t.Text = LexerUtils.UnescapeLuaString(t, text.ToString());
+					t.SetText(LexerUtils.UnescapeLuaString(t, text.ToString()));
 					return t;
 				}
 				else
@@ -560,10 +561,8 @@ namespace MoonSharp.Interpreter.Tree
 
 		private Token CreateToken(TokenType tokenType, int fromLine, int fromCol, string text = null)
 		{
-			Token t = new Token(tokenType, m_SourceId, fromLine, fromCol, m_Line, m_Col, m_PrevLineTo, m_PrevColTo)
-			{
-				Text = text
-			};
+			Token t = new Token(tokenType, m_SourceId, fromLine, fromCol, m_Line, m_Col, m_PrevLineTo, m_PrevColTo);
+			t.SetText(text);
 			m_PrevLineTo = m_Line;
 			m_PrevColTo = m_Col;
 			return t;
