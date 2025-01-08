@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using MoonSharp.Interpreter.NetCore;
 
 namespace MoonSharp.Interpreter.Tree
 {
@@ -410,7 +411,7 @@ namespace MoonSharp.Interpreter.Tree
 		{
 			char c = CursorChar();
 			CursorCharNext();
-			return CreateToken(tokenType, fromLine, fromCol, c.ToString());
+			return CreateToken(tokenType, fromLine, fromCol, c.CharToString());
 		}
 
 		private Token ReadHashBang(int fromLine, int fromCol)
@@ -529,7 +530,7 @@ namespace MoonSharp.Interpreter.Tree
 
 		private Token PotentiallyDoubleCharOperator(char expectedSecondChar, TokenType singleCharToken, TokenType doubleCharToken, int fromLine, int fromCol)
 		{
-			string op = CursorChar().ToString();
+			string op = CursorChar().CharToString();
 
 			CursorCharNext();
 
