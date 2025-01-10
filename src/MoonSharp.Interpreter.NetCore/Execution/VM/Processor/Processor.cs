@@ -10,8 +10,8 @@ internal sealed partial class Processor
 {
 	private ByteCode m_RootChunk;
 
-	private FastStack<DynValue> m_ValueStack = new(131072);
-	private FastStack<CallStackItem> m_ExecutionStack = new(131072);
+	private FastStack<DynValue> m_ValueStack;
+	private FastStack<CallStackItem> m_ExecutionStack;
 	private List<Processor> m_CoroutinesStack;
 
 	private Table? m_GlobalTable;
